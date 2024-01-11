@@ -1,0 +1,36 @@
+name: wohlig devops test
+
+on:
+  push:
+    branches:
+      - 'uat'
+
+env:
+  GITHUB_TOKEN: ${{ secrets.TOKEN100 }}
+
+jobs:
+  update-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout test-commits
+        uses: actions/checkout@v3
+      - name: checkout test-gitops
+        run: git clone https://Javed-Patel-wohlig:${{ secrets.TOKEN100 }}@github.com/Javed-Patel-wohlig/test-gitops.git
+      - name: configure git
+        run: |
+          git config --global user.email "javed.patel@wohlig.com"
+          git config --global user.name "Javed-Patel-wohlig"
+      - name: Update count.txt
+        run: |
+          cd test-gitops
+
+          commit_count=$(grep -oP '(?<=commit count is: )\d+' count.txt)
+          new_commit_count=$((commit_count + 50))
+          
+          echo "hello i am devops" > count.txt
+          echo "my commit count is: $new_commit_count" >> count.txt
+          echo "thank you" >> count.txt
+
+          git add .
+          git commit -m "update new count"
+          git push origin main
